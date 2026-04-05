@@ -1,6 +1,6 @@
 import requests
 import allure
-from api_testing.endpoints.base_endpoint import BaseEndpoint
+from endpoints.base_endpoint import BaseEndpoint
 
 
 class GetAllMeme(BaseEndpoint):
