@@ -1,25 +1,21 @@
 import pytest
-from api_testing.endpoints.base_endpoint import BaseEndpoint
-from api_testing.endpoints.authorize import Authorize
-from api_testing.endpoints.delete_meme import DeleteMeme
-from api_testing.endpoints.get_all_meme import GetAllMeme
-from api_testing.endpoints.get_meme_id import GetMemeID
-from api_testing.endpoints.post_new_meme import PostNewMeme
-from api_testing.endpoints.put_meme import PutMeme
+from endpoints.base_endpoint import BaseEndpoint
+from endpoints.authorize import Authorize
+from endpoints.delete_meme import DeleteMeme
+from endpoints.get_all_meme import GetAllMeme
+from endpoints.get_meme_id import GetMemeID
+from endpoints.post_new_meme import PostNewMeme
+from endpoints.put_meme import PutMeme
+import data
 
 
 @pytest.fixture
 def payload():
-    return {"name": "Jason Statham"}
+    return data.payload
 
 @pytest.fixture
 def post_payload():
-    return {
-    "text": "Возьми телефон, детка",
-    "url": "https://i.ytimg.com/vi/lPr9iVqmAng/sddefault.jpg",
-    "tags": ["Toxis, телефон, детка"],
-    "info": {}
-}
+    return data.post_payload
 
 @pytest.fixture
 def put_payload(post_new_meme, post_payload, headers, delete_meme):
@@ -35,14 +31,11 @@ def put_payload(post_new_meme, post_payload, headers, delete_meme):
 
 @pytest.fixture
 def payload_no_required_fields():
-    return {
-        "tags": ["Test, qwe"],
-        "info": {}
-    }
+    return data.payload_no_required_fields
 
 @pytest.fixture
 def invalid_headers():
-    return {"Authorization": "invalid_token"}
+    return data.invalid_headers
 
 @pytest.fixture
 def headers(authoriz, payload):
@@ -78,6 +71,7 @@ def delete_meme():
     return DeleteMeme()
 
 @pytest.fixture
-def create_meme(post_new_meme, headers, post_payload):
+def create_and_delete_meme(post_new_meme, headers, post_payload, delete_meme):
     meme_id = post_new_meme.post_new_meme(post_payload, headers)['id']
-    return meme_id
+    yield meme_id
+    delete_meme.delete_meme(headers, meme_id)
